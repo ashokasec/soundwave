@@ -9,7 +9,6 @@ import {
 } from "@/lib/blockchain";
 import { derivePath } from "ed25519-hd-key";
 import { Keypair } from "@solana/web3.js";
-import nacl from "tweetnacl";
 import { hdkey } from "ethereumjs-wallet";
 import bs58 from "bs58";
 
@@ -99,17 +98,18 @@ export const SoundwaveProvider: React.FC<{ children: React.ReactNode }> = ({
           "x",
           solanaWalletIndex
         );
+
         const solanaDerivedSeed = derivePath(
           solanaDerivationPath,
           seedBuffer.toString("hex")
         ).key;
-        const solanaSecretKey =
-          nacl.sign.keyPair.fromSeed(solanaDerivedSeed).secretKey;
+
+        const keypair = Keypair.fromSeed(Uint8Array.from(solanaDerivedSeed));
+
         const solanaNewWallet = {
           title: `Wallet ${parseInt(solanaWalletIndex) + 1}`,
-          privateKey: bs58.encode(solanaSecretKey),
-          publicKey:
-            Keypair.fromSecretKey(solanaSecretKey).publicKey.toBase58(),
+          privateKey: bs58.encode(keypair.secretKey),
+          publicKey: keypair.publicKey.toString(),
         };
         setSolanaWallets((prev) =>
           prev ? [...prev, solanaNewWallet] : [solanaNewWallet]
@@ -131,8 +131,9 @@ export const SoundwaveProvider: React.FC<{ children: React.ReactNode }> = ({
 
         const ethereumNewWallet = {
           title: `Wallet ${parseInt(ethereumWalletsIndex) + 1}`,
-          privateKey: wallet.getPrivateKeyString(),
-          publicKey: wallet.getAddressString(),
+          privateKey: "0x" + wallet.getPrivateKey().toString("hex"),
+          publicKey: "0x" + wallet.getPublicKey().toString("hex"),
+          address: "0x" + wallet.getAddress().toString("hex"),
         };
 
         setEthereumWallets((prev) =>

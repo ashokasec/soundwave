@@ -4,6 +4,7 @@ export interface Wallet {
     title: string;
     privateKey: string;
     publicKey: string;
+    address?: string
 }
 
 export type Blockchain = "bitcoin" | "ethereum" | "solana";

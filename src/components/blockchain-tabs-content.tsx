@@ -15,13 +15,7 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 
-function WalletKey({
-  type,
-  value,
-}: {
-  type: "private" | "public";
-  value: string;
-}) {
+function WalletKey({ label, value }: { label: string; value: string }) {
   function handleCopy(string: string) {
     window.navigator.clipboard.writeText(string);
     alert("copied");
@@ -29,7 +23,7 @@ function WalletKey({
   return (
     <TooltipProvider>
       <div className="text-gray-400 pl-1.5 text-sm tracking-wide mb-1">
-        {type === "private" ? "Public Key" : "Private Key"}
+        {label}
       </div>
       <Tooltip>
         <TooltipTrigger
@@ -112,8 +106,23 @@ const BlockchainTabsContent = ({
                         </Button>
                       </CardHeader>
                       <CardContent className="p-0 space-y-4">
-                        <WalletKey type="public" value={wallet.publicKey} />
-                        <WalletKey type="private" value={wallet.privateKey} />
+                        <WalletKey
+                          label="Private Key"
+                          value={wallet.privateKey}
+                        />
+                        {blockchain === "ethereum" ? (
+                          wallet.address && (
+                            <WalletKey
+                              label="Ethereum Address"
+                              value={wallet.address}
+                            />
+                          )
+                        ) : (
+                          <WalletKey
+                            label="Public Key"
+                            value={wallet.publicKey}
+                          />
+                        )}
                       </CardContent>
                     </Card>
                   </li>
@@ -126,8 +135,10 @@ const BlockchainTabsContent = ({
                   </p>
                   <p>
                     Click{" "}
-                    <span className="font-semibold">&quot;Add New Wallet&quot;</span> to
-                    create one.
+                    <span className="font-semibold">
+                      &quot;Add New Wallet&quot;
+                    </span>{" "}
+                    to create one.
                   </p>
                 </div>
               )}
